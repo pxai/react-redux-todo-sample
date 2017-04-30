@@ -4,8 +4,14 @@ var redux = require('redux');
 
 console.log('Starting redux ')
 
-
-var reducer = (state = {name: 'Anonymous'} , action) => {
+var defaultState = {
+    name: 'Anonymous',
+    hobbies: [],
+    movies: [] // Id, title, Genre
+}
+var hobbyId = 1;
+var movieId = 1;
+var reducer = (state = defaultState , action) => {
     //state = state || {name: 'Anonymous'};  // ES5: With this creates an default arg. ES6 default value
     console.log('new action: ', action);
     switch (action.type) {
@@ -14,6 +20,28 @@ var reducer = (state = {name: 'Anonymous'} , action) => {
                     ...state,
                     name: action.name
                 };
+        case 'ADD_HOBBY':
+            return {
+                ...state,
+                hobbies: [// ES6 spread operator!! to add elements to an array
+                    ...state.hobbies,
+                    {
+                        id: hobbyId++,
+                        hobby: action.hobby
+                    }
+                ]
+            };
+        case 'ADD_MOVIE':
+            return {
+                ...state,
+                movies: [// ES6 spread operator!! to add elements to an array
+                    ...state.movies,
+                    {
+                        id: movieId++,
+                        ...action.movie
+                    }
+                ]
+            };
         default:
             return state;
     }
@@ -26,7 +54,7 @@ var store = redux.createStore(reducer);
 var unsubscribe = store.subscribe( () => {
    var state = store.getState();
 
-   console.log('Name was changed in store!! ', state.name);
+   console.log('Name was changed in store!! ', state);
 });
 
 var currentState = store.getState(); // It gets the state
@@ -44,9 +72,30 @@ var action = {
 store.dispatch(action);
 console.log('current state', store.getState());
 
-unsubscribe();  //we can unsuscribe to the store with this, we will not see the next:
+// unsubscribe();  //we can unsuscribe to the store with this, we will not see the next:
 
 store.dispatch({
     type: 'CHANGE_NAME',
     name: 'ANY'
+});
+
+store.dispatch({
+    type: 'ADD_HOBBY',
+    hobby: 'Learning'
+});
+
+store.dispatch({
+    type: 'ADD_MOVIE',
+    movie: {
+        title: 'Riders of the Lost Ark',
+        genre: 'Adventures'
+    }
+});
+
+store.dispatch({
+    type: 'ADD_MOVIE',
+    movie: {
+        title: 'The Empire Strikes Back',
+        genre: 'Sci-Fi'
+    }
 });

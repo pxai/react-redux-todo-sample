@@ -9,8 +9,8 @@ var App = React.createClass({
         );
     }
 });
-//require('./redux-example'); // works
-require('./redux-todo-example');
+require('./redux-example'); // works
+//require('./redux-todo-example');
 export default App;
 
 
