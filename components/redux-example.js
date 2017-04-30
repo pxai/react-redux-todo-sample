@@ -17,9 +17,10 @@ var reducer = (state = defaultState , action) => {
     switch (action.type) {
         case 'CHANGE_NAME':
             return {
-                    ...state,
-                    name: action.name
-                };
+                ...state,
+                name: action.name
+            };
+
         case 'ADD_HOBBY':
             return {
                 ...state,
@@ -31,9 +32,24 @@ var reducer = (state = defaultState , action) => {
                     }
                 ]
             };
-        case 'ADD_MOVIE':
+
+        case 'REMOVE_HOBBY':
             return {
                 ...state,
+                // we use filter method of arrays, this creates a new array, don't update the state
+                // so we have a pure function doing this. // true removes, false, does not and removes from array
+                // filters out every element that returns true
+                hobbies: state.hobbies.filter(function (hobby) {
+                    return hobby.id !== action.id;
+                })
+                /* // Short version
+                 hobbies: state.hobbies.filter((hobby) => hobby.id !== action.id)
+                 */
+            };
+
+        case 'ADD_MOVIE':
+            return {
+                ...state, // ES6 spread operator!!
                 movies: [// ES6 spread operator!! to add elements to an array
                     ...state.movies,
                     {
@@ -42,6 +58,13 @@ var reducer = (state = defaultState , action) => {
                     }
                 ]
             };
+
+        case 'REMOVE_MOVIE':
+            return {
+                ...state, // ES6 spread operator!!
+                movies: state.movies.filter( (movie) => movie.id !== action.id)
+            };
+
         default:
             return state;
     }
@@ -52,9 +75,9 @@ var store = redux.createStore(reducer);
 // We will call this function everytime the store changes:
 // subscribe to changes
 var unsubscribe = store.subscribe( () => {
-   var state = store.getState();
+    var state = store.getState();
 
-   console.log('Name was changed in store!! ', state);
+    console.log('Name was changed in store!! ', state);
 });
 
 var currentState = store.getState(); // It gets the state
@@ -85,6 +108,16 @@ store.dispatch({
 });
 
 store.dispatch({
+    type: 'ADD_HOBBY',
+    hobby: 'Teaching'
+});
+
+store.dispatch({
+    type: 'REMOVE_HOBBY',
+    id: 2
+});
+
+store.dispatch({
     type: 'ADD_MOVIE',
     movie: {
         title: 'Riders of the Lost Ark',
@@ -98,4 +131,9 @@ store.dispatch({
         title: 'The Empire Strikes Back',
         genre: 'Sci-Fi'
     }
+});
+
+store.dispatch({
+    type: 'REMOVE_MOVIE',
+    id: 1
 });
