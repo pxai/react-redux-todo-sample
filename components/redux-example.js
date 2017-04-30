@@ -11,7 +11,8 @@ var defaultState = {
 }
 var hobbyId = 1;
 var movieId = 1;
-var reducer = (state = defaultState , action) => {
+
+var oldReducer = (state = defaultState , action) => {
     //state = state || {name: 'Anonymous'};  // ES5: With this creates an default arg. ES6 default value
     console.log('new action: ', action);
     switch (action.type) {
@@ -70,6 +71,57 @@ var reducer = (state = defaultState , action) => {
     }
     return state;
 }
+
+// In this case, state is just an String
+var nameReducer = (state = 'Anonymous', action) => {
+    switch (action.type) {
+        case 'CHANGE_NAME':
+            return action.name;
+        default:
+            return state;
+    }
+};
+
+// checck it out!! Now it changes only its own state
+var hobbiesReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'ADD_HOBBY':
+            return [
+                    ...state,
+                    {
+                        id: hobbyId++,
+                        hobby: action.hobby
+                    }
+            ];
+        case 'REMOVE_HOBBY':
+            return state.filter((hobby) => hobby.id !== action.id)
+        default:
+            return state;
+    }
+};
+var moviesReducer = (state = [], action) => {
+    switch (action.type) {
+        case 'ADD_MOVIE':
+            return [ // ES6 spread operator!! to add elements to an array
+                    ...state,
+                    {
+                        id: movieId++,
+                        ...action.movie
+                    }
+                ]
+        case 'REMOVE_MOVIE':
+            return state.filter( (movie) => movie.id !== action.id);
+        default:
+            return state;
+    }
+};
+// combineReducers: takes one argument, object, key-value pairs, with
+// the objects we want for each reducers
+var reducer = redux.combineReducers({
+    name: nameReducer,
+    hobbies: hobbiesReducer,
+    movies: moviesReducer
+});
 var store = redux.createStore(reducer);
 
 // We will call this function everytime the store changes:
