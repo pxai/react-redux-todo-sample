@@ -4,16 +4,6 @@ var redux = require('redux');
 
 console.log('Starting redux ')
 
-// THE STORE
-// the createStore argument needs to be a PURE FUNCTION
-//  var store = Redux.createStore();
-// in this case a reducer: takes your existing state and an action
-// and calculates a NEW STATE. It needs to have a default state {name: 'Anonymous'}
-// takes two arguments.
-// 1. previous state
-// 2. the action
-
-
 
 var reducer = (state = {name: 'Anonymous'} , action) => {
     //state = state || {name: 'Anonymous'};  // ES5: With this creates an default arg. ES6 default value
@@ -31,6 +21,14 @@ var reducer = (state = {name: 'Anonymous'} , action) => {
 }
 var store = redux.createStore(reducer);
 
+// We will call this function everytime the store changes:
+// subscribe to changes
+var unsubscribe = store.subscribe( () => {
+   var state = store.getState();
+
+   console.log('Name was changed in store!! ', state.name);
+});
+
 var currentState = store.getState(); // It gets the state
 console.log('current state', currentState);
 
@@ -46,3 +44,9 @@ var action = {
 store.dispatch(action);
 console.log('current state', store.getState());
 
+unsubscribe();  //we can unsuscribe to the store with this, we will not see the next:
+
+store.dispatch({
+    type: 'CHANGE_NAME',
+    name: 'ANY'
+});

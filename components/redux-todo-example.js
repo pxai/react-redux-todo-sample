@@ -24,9 +24,17 @@ var reducer = (state = stateDefault , action) => {
         default:
             return state;
     }
-}
+};
+var store = redux.createStore(reducer, redux.compose( // For debugging
+    window.devToolsExtension ? window.devToolsExtension() : f => f
+));
+var unsubscribe = store.subscribe( () => {
+    var state = store.getState();
+    console.log('Changes in store!! ', state);
+    //document.getElementById('app').innerHTML = state.name;
+});
 
-var store = redux.createStore(reducer);
+
 
 var currentState = store.getState(); // It gets the state
 console.log('current state for ToDO', currentState);
@@ -41,3 +49,5 @@ var action = {
 // We dispatch to the store,. Argument: our action
 store.dispatch(action);
 console.log('current state for ToDo', store.getState());
+store.dispatch({  type: 'CHANGE_SEARCH',
+    name: 'Just another change'});
