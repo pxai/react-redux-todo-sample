@@ -1,6 +1,7 @@
 //import createStore   from 'redux';
 
 var redux = require('redux');
+import jQuery from '../public/js/jquery.min';
 
 console.log('Starting redux ')
 
@@ -102,12 +103,63 @@ var removeMovie = (id) => {
         id
     }
 };
+
+// remoteApiReducer. ASYNCHRONOUS call to a remote API
+var remoteApiReducer = (state = {isFetching: false, url: undefined}, action) => {
+    switch (action.type) {
+        case 'START_API_FETCH':
+            return {
+                isFetching: true,
+                url: undefined
+            };
+        case 'COMPLETE_API_FETCH':
+            return {
+                isFetching: false,
+                url: action.url
+            };
+        default:
+            return state;
+    }
+};
+// ACTIONS
+var startRemoteApiFetch = () => {
+    return {
+        type: 'START_API_FETCH'
+    }
+};
+var completeRemoteApiFetch = (url) => {
+    return {
+        type: 'COMPLETE_API_FETCH',
+        url
+    }
+};
+// fetchRemoteApiData :This requires data from remote API
+var  fetchRemoteApiData = () => {
+    store.dispatch(startRemoteApiFetch()); // We start the fetch
+    // remote api call, asynchronous request for data
+    /* axios.get('http://ipinfo.io').then(function (res) {
+        var loc = res.data.loc;
+        var baseUrl = 'http://maps.google.com/?q=';
+        store.dispatch(completeRemoteApiFetch(baseUrl + loc));
+     });
+     */
+    jQuery.ajax({
+        url: '/api/data.json',
+        context: this,
+        dataType: 'json',
+        type: 'GET'
+    }).done(function (data) {
+        store.dispatch(completeRemoteApiFetch('Ok, data fetched ' + data.length));
+    });
+};
+
 // combineReducers: takes one argument, object, key-value pairs, with
 // the objects we want for each reducers
 var reducer = redux.combineReducers({
     name: nameReducer,
     hobbies: hobbiesReducer,
-    movies: moviesReducer
+    movies: moviesReducer,
+    remoteApi: remoteApiReducer
 });
 var store = redux.createStore(reducer);
 
@@ -117,14 +169,22 @@ var unsubscribe = store.subscribe( () => {
     var state = store.getState();
 
     console.log('Name was changed in store!! ', state);
+    if (state.remoteApi.isFetching) {
+        document.getElementById('app').innerHTML = 'Loading...';
+    } else if (state.remoteApi.url) {
+        document.getElementById('app').innerHTML = 'Data loaded';
+    }
 });
 
 var currentState = store.getState(); // It gets the state
 console.log('current state', currentState);
 
+
+
 // ACTIONS
 // In this case we will dispatchActions
 // We will define actions, objects with a TYPE property
+fetchRemoteApiData();
 
 // We dispatch to the store,. Argument: our action
 store.dispatch(changeName('Eugene'));
