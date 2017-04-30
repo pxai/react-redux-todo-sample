@@ -4,74 +4,10 @@ var redux = require('redux');
 
 console.log('Starting redux ')
 
-var defaultState = {
-    name: 'Anonymous',
-    hobbies: [],
-    movies: [] // Id, title, Genre
-}
-var hobbyId = 1;
-var movieId = 1;
 
-var oldReducer = (state = defaultState , action) => {
-    //state = state || {name: 'Anonymous'};  // ES5: With this creates an default arg. ES6 default value
-    console.log('new action: ', action);
-    switch (action.type) {
-        case 'CHANGE_NAME':
-            return {
-                ...state,
-                name: action.name
-            };
 
-        case 'ADD_HOBBY':
-            return {
-                ...state,
-                hobbies: [// ES6 spread operator!! to add elements to an array
-                    ...state.hobbies,
-                    {
-                        id: hobbyId++,
-                        hobby: action.hobby
-                    }
-                ]
-            };
 
-        case 'REMOVE_HOBBY':
-            return {
-                ...state,
-                // we use filter method of arrays, this creates a new array, don't update the state
-                // so we have a pure function doing this. // true removes, false, does not and removes from array
-                // filters out every element that returns true
-                hobbies: state.hobbies.filter(function (hobby) {
-                    return hobby.id !== action.id;
-                })
-                /* // Short version
-                 hobbies: state.hobbies.filter((hobby) => hobby.id !== action.id)
-                 */
-            };
-
-        case 'ADD_MOVIE':
-            return {
-                ...state,  // ES6 spread operator!!
-                movies: [ // ES6 spread operator!! to add elements to an array
-                    ...state.movies,
-                    {
-                        id: movieId++,
-                        ...action.movie
-                    }
-                ]
-            };
-
-        case 'REMOVE_MOVIE':
-            return {
-                ...state,  // ES6 spread operator!!
-                movies: state.movies.filter( (movie) => movie.id !== action.id)
-            };
-
-        default:
-            return state;
-    }
-    return state;
-}
-
+// Name reducer
 // In this case, state is just an String
 var nameReducer = (state = 'Anonymous', action) => {
     switch (action.type) {
@@ -82,6 +18,17 @@ var nameReducer = (state = 'Anonymous', action) => {
     }
 };
 
+// ACTIONS
+// we define this action instead of passing alll the object to dispatch
+var changeName = (name) => {
+    return {
+        type: 'CHANGE_NAME',
+        name // ES6!! when name: name
+    };
+};
+
+// Hobbies reducer
+var hobbyId = 1;
 // checck it out!! Now it changes only its own state
 var hobbiesReducer = (state = [], action) => {
     switch (action.type) {
@@ -99,6 +46,22 @@ var hobbiesReducer = (state = [], action) => {
             return state;
     }
 };
+
+// ACTION functions
+var addHobby = (hobby) => {
+    return {
+        type: 'ADD_HOBBY',
+        hobby
+    }
+};
+var removeHobby = (id) => {
+    return {
+        type: 'REMOVE_HOBBY',
+        id
+    }
+};
+// Movies reducer
+var movieId = 1;
 var moviesReducer = (state = [], action) => {
     switch (action.type) {
         case 'ADD_MOVIE':
@@ -113,6 +76,30 @@ var moviesReducer = (state = [], action) => {
             return state.filter( (movie) => movie.id !== action.id);
         default:
             return state;
+    }
+}
+
+// ACTION functions
+var addMovie = (movie) => {
+    return {
+        type: 'ADD_MOVIE',
+        movie
+    }
+};
+/**
+ * // Another way, but have to change the reducer
+var addMovie = (title, genre) => {
+   return {
+    type: 'ADD_MOVIE',
+    title.
+    genre
+   }
+};
+ */
+var removeMovie = (id) => {
+    return {
+        type: 'REMOVE_MOVIE',
+        id
     }
 };
 // combineReducers: takes one argument, object, key-value pairs, with
@@ -138,54 +125,31 @@ console.log('current state', currentState);
 // ACTIONS
 // In this case we will dispatchActions
 // We will define actions, objects with a TYPE property
-var action = {
-    // Rule of thumb: upper case and underscores
-    type: 'CHANGE_NAME',
-    name: 'Eugene'  // we passs a namein this action
-};
+
 // We dispatch to the store,. Argument: our action
-store.dispatch(action);
+store.dispatch(changeName('Eugene'));
 console.log('current state', store.getState());
 
 // unsubscribe();  //we can unsuscribe to the store with this, we will not see the next:
 
-store.dispatch({
-    type: 'CHANGE_NAME',
-    name: 'ANY'
-});
+store.dispatch(changeName('Any'));
 
-store.dispatch({
-    type: 'ADD_HOBBY',
-    hobby: 'Learning'
-});
+store.dispatch(addHobby('Learning'));
 
-store.dispatch({
-    type: 'ADD_HOBBY',
-    hobby: 'Teaching'
-});
+store.dispatch(addHobby('Teaching'));
 
-store.dispatch({
-    type: 'REMOVE_HOBBY',
-    id: 2
-});
+store.dispatch(removeHobby(2));
 
-store.dispatch({
-    type: 'ADD_MOVIE',
-    movie: {
-        title: 'Riders of the Lost Ark',
-        genre: 'Adventures'
-    }
-});
+store.dispatch(addMovie({movie: {
+                    title: 'Riders of the Lost Ark',
+                    genre: 'Adventures'
+                }}
+             ));
 
-store.dispatch({
-    type: 'ADD_MOVIE',
-    movie: {
+store.dispatch(addMovie({movie: {
         title: 'The Empire Strikes Back',
         genre: 'Sci-Fi'
-    }
-});
+    }}
+));
 
-store.dispatch({
-    type: 'REMOVE_MOVIE',
-    id: 1
-});
+store.dispatch(removeMovie(1));
