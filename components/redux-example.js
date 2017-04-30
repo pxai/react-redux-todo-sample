@@ -49,8 +49,8 @@ var reducer = (state = defaultState , action) => {
 
         case 'ADD_MOVIE':
             return {
-                ...state, // ES6 spread operator!!
-                movies: [// ES6 spread operator!! to add elements to an array
+                ...state,  // ES6 spread operator!!
+                movies: [ // ES6 spread operator!! to add elements to an array
                     ...state.movies,
                     {
                         id: movieId++,
@@ -61,7 +61,7 @@ var reducer = (state = defaultState , action) => {
 
         case 'REMOVE_MOVIE':
             return {
-                ...state, // ES6 spread operator!!
+                ...state,  // ES6 spread operator!!
                 movies: state.movies.filter( (movie) => movie.id !== action.id)
             };
 
